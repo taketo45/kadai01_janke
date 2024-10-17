@@ -1,0 +1,200 @@
+body{
+    margin:0;
+    padding:0;
+    text-align:left;
+    font-size: 32px;
+    /* background-image: url(../img/raining-money-12.gif); */
+    background-color: #f0e68c;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+header{
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+
+.mainarea {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.insertCoin {
+    background-color: #fff;
+}
+
+
+.coin {
+    display: flex;
+
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 64px;
+    font-weight: bold;
+}
+
+
+
+main{
+    border-bottom:1px solid #ccc;
+}
+footer{
+    background-color: #fff;
+    border-bottom:1px solid #ccc;
+    text-align: center;
+}
+p{
+    /* font-size:200%; */
+    text-align: center;
+    /* border-bottom:1px solid #fff; */
+    /* height:200px; */
+}
+ul{
+    padding: 0;
+    /* border-top: 1px solid #000000; */
+    display:flex;  /* 定義 */
+    justify-content: space-around;
+    table-layout: fixed;
+    width:100%;
+}
+li{
+    text-align: center;
+    list-style-type:none;
+    border: 1px solid #666;
+    background-color: #c3f2ff;
+    display: flex;  
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+#janken li:nth-child(1) {
+    border: none;
+    background-color: none;
+}
+
+/* li:hover{
+    background: #0066CC;
+    color:#fff;
+} */
+
+/* .gamebutton {
+    display: flex;
+    justify-content: center;
+  } */
+
+.multidisplay {
+    /* border-top: 1px solid #000000; */
+    padding: 20px;
+    height: 100px;
+    display:flex;  /* 定義 */
+    justify-content: space-around;
+    table-layout: fixed;
+    width:100%;
+}
+.multi {
+    margin-top: 10px;
+    padding: 4px;
+    margin-bottom: 10px;
+    text-align: center;
+    list-style-type:none;
+    border: 2px solid #c8412d;
+    /* border: 2px solid #c8412d; */
+    /* background-color: #f98fab; */
+    background-color: #ffcaca;
+    display: flex;  
+    cursor: pointer;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+
+  .game-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: none;
+    background-color: none;
+    cursor: pointer; /* マウスカーソルが人差し指の形に変更 */
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  /* .game-btn:hover {
+    background-color: #0066CC;
+  } */
+  
+  .game-btn img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+  
+  /* スタートボタンのサイズを調整（必要に応じて） */
+  #start_btn {
+    width: 100px;
+    height: 100px;
+  }
+
+
+.result {
+    height: 80px;
+    /* border: 1px solid red; */
+}
+
+#judgment {
+    text-align: center;
+    height: 70px;
+    margin-top: 20px;
+    /* border: 1px solid red; */
+    padding: 0;
+    color: #8b4513;
+    background-color: #fff;
+}
+
+/* #start_btn img:hover {
+        width: 95px;
+} */
+
+#junkenDisplay {
+    margin: auto;
+    width: 250px;
+    height: 250px;
+    /* background-color: rgb(191, 188, 188); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.coinDisplay {
+    display: flex;
+    justify-content: space-around;
+}
+
+.midleDisplay {
+    display: flex;
+    justify-content: space-around;
+}
+
+.keybind {
+    display: flex;
+    justify-content: space-around;
+}

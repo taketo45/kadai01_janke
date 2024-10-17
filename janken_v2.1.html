@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/sample.css">
+<title>じゃんけん</title>
+</head>
+<body>
+  <audio src="./sound/junkenpon.m4a" id="junkenponSound" class="sound"></audio>
+  <audio src="./sound/win.m4a" id="winSound" class="sound"></audio>
+  <audio src="./sound/lose.m4a" id="loseSound" class="sound"></audio>
+  <audio src="./sound/even.mp4" id="evenSound" class="sound"></audio>
+
+<header>
+  <h1>じゃんけん</h1>
+</header>
+<main class="mainarea">
+  <section class="insertCoin">
+    <div class="midleDisplay">
+      <div class="insert">
+        <button id="tenYenInsert">10円投入</button>
+        <button id="hundredYenInsert">100円投入</button>
+      </div>
+      <div class="midleDisplay">
+        <div id="medalTitle">メダル数：</div>
+        <div id="medalnum"></div>
+      </div>
+      <div class="midleDisplay">
+        <button id="medalSet">メダルを持ち帰る</button>
+        <button id="medalGet">メダルを使う</button>
+      </div>
+    </div>
+  </section>
+  <section class="multierea">
+    <div class="multibox">
+      <ul id="multidisplay">
+        <li class="multi" id="multi02">2</li>
+        <li class="multi" id="multi04">4</li>
+        <li class="multi" id="multi08">8</li>
+        <li class="multi" id="multi16">16</li>
+        <li class="multi" id="multi32">32</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section class="result">
+    <h2><div id="judgment"></div></h2> 
+  </section>
+
+  <p class="pccomment"></p>
+  <div id="junkenDisplay">
+    <div id="pc_hands"></div>
+  </div>
+  <!-- <div>あなたの出した手
+    <div id="your_hands"></div>
+  </div> -->
+  
+
+
+  <section class="buttonerea">
+    <div class="gamebutton">
+      <ul id="janken">
+        <li><button id="start_btn" class="game-btn"><img src="./img/startbtn.jpeg" width="105" alt="スタート"></button></li>
+        <li><button id="gu_btn" class="game-btn"><img src="./img/gu.png" width="60" alt="グー"></button></li>
+        <li><button id="cho_btn" class="game-btn"><img src="./img/choki.png" width="60" alt="チョキ"></button></li>
+        <li><button id="par_btn" class="game-btn"><img src="./img/pa.png" width="60" alt="パー"></button></li>
+      </ul>
+    </div>
+    
+  </section>
+</main>
+
+<footer>
+  <div class="keybind">
+    <div class="startKey">[S]</div>
+    <div class="guKey">[G]</div>
+    <div class="chokiKey">[K]</div>
+    <div class="paKey">[P]</div>
+  </div>
+
+</footer>
+<script>
+//じゃんけん用のSCRIPTを書いてください
+
+let pcHand = 0;
+let yourHand = 0;
+const GU = 1;
+const CHOKI = 2;
+const PA = 3;
+const guImg = '<img src="./img/gu.png" width="50">';
+const choImg = '<img src="./img/choki.png" width="50">';
+const paImg = '<img src="./img/pa.png" width="50">';
+const guImg_L = '<img src="./img/gu.png" width="250">';
+const choImg_L = '<img src="./img/choki.png" width="250">';
+const paImg_L = '<img src="./img/pa.png" width="250">';
+const $startBtn = $("#start_btn");
+const $guBtn = $("#gu_btn");
+const $choBtn = $("#cho_btn");
+const $paBtn = $('#par_btn');
+const $judgment = $('#judgment');
+const judge = "";
+const $yourHands = $('#your_hands');
+const $pcHands = $('#pc_hands');
+const evenMsg = '<h2>あいこ</h2>';
+const loseMsg = '<h2>まけ</h2>';
+const winMsg = '<h2>かち</h2>';
+const clearMsg = '<h2></h2>';
+const guchopaImg = '<img src="./img/guchopa.gif" width="150">';
+const junkenponSound = $("#junkenponSound").get(0);
+const winSound = $("#winSound").get(0);
+const loseSound = $("#loseSound").get(0);
+const evenSound = $("#evenSound").get(0);
+let winCount = 0;
+const $multi02 = $("#multi02");
+const $multi04 = $("#multi04");
+const $multi08 = $("#multi08");
+const $multi16 = $("#multi16");
+const $multi32 = $("#multi32");
+const $multiAll = $(".multi");
+const $medalnum = $("#medalnum");
+let medal = 0;
+let audio;
+const $tenYenInsert = $("#tenYenInsert");
+const $hundredYenInsert = $("#hundredYenInsert");
+const $medalSet = $("#medalSet");
+const $medalGet = $("#medalGet");
+const $document = $(document);
+let audiAble = false;
+let $sound = $(".sound");
+let isGuChokiPaAble = false;
+let isStartAble = true;
+// const medalDelete = $("#medalDelete");
+
+
+$document.ready(function() {
+  // グー、チョキ、パーのボタンを最初に無効化
+  guchopaDisable();
+  btnHideControl();
+  audio = junkenponSound;
+  // audioStop();
+  medalInfo();
+  bgGifDisplay(1);
+
+  $tenYenInsert.on("click",function(){
+    medalPayment(1);
+  });
+  $hundredYenInsert.on("click",function(){
+    medalPayment(10);
+  });
+
+  $medalSet.on("click",function(){
+    setCookie();
+    medal = 0;
+    medalInfo();
+  });
+  $medalGet.on("click",function(){
+    medal += getCookie()||0;
+    deleteGookie();
+    medalInfo();
+  });
+
+
+
+$startBtn.on("click",function(){
+    startFunction();
+});
+
+$guBtn.on("click",function(){
+  guFunction();
+});
+
+
+
+$choBtn.on("click",function(){
+  chokiFunction();
+});
+
+
+$paBtn.on("click",function(){
+  paFunction();
+});
+
+$document.keydown(function (e) {
+  const key = e.keyCode;
+  if(key == 83){
+    startFunction();
+  }
+  if(key === 71){
+    if(!isGuChokiPaAble){
+      return;
+    }
+    guFunction();
+  }
+  if(key === 75){
+    if(!isGuChokiPaAble){
+      return;
+    }
+    chokiFunction();
+  }
+  if(key === 80){
+    if(!isGuChokiPaAble){
+      return;
+    }
+    paFunction();
+  }
+});
+
+
+function startFunction(){
+  if(!isPlayAble()){
+    return;
+  }
+  startDisable();
+  medalConsumption();
+  initStatus();
+  // $(this).animate({width: '90px'}, 1000,).delay(500).animate({width: '105px'}, 500);
+  $startBtn.animate({width: "90px"}, 100)
+    .promise().done(function() {
+      setTimeout(() => {
+        $startBtn.animate({width: "105px"}, 100);
+      }, 100);
+    });
+    console.log('animate');
+    audio = junkenponSound;
+    audio.load();
+    audio.play();
+    console.log('sound');
+    guchopaRoundFunction();
+    clearBtn();
+    guchopaEnable();
+    btnShowControl();
+  }
+
+function guFunction(){
+  yourHand = GU;
+  clearBtn();
+  $guBtn.css("background","#0066CC");
+  $yourHands.html(guImg);
+  pcJunken();
+  audio.pause();
+  judgement();
+  displayHtml();
+}
+
+function chokiFunction(){
+  yourHand = CHOKI;
+  clearBtn();
+  $choBtn.css("background","#0066CC");
+  $yourHands.html(choImg);
+  pcJunken();
+  audio.pause();
+  judgement();
+  displayHtml();
+}
+
+function paFunction(){
+  yourHand = PA;
+  clearBtn();
+  $paBtn.css("background","#0066CC");
+  $yourHands.html(paImg);
+  pcJunken();
+  audio.pause();
+  judgement();
+  displayHtml();
+}
+
+function clearBtn() {
+  $guBtn.css("background","#c3f2ff");
+  $choBtn.css("background","#c3f2ff");
+  $paBtn.css("background","#c3f2ff");
+}
+
+  function pcJunken() {
+    //PCのじゃんけん
+    pcHand = Math.ceil(Math.random() * 3);
+  }
+
+  function judgement() {
+
+    //勝ちパターン
+    if((yourHand === GU && pcHand === CHOKI)||(yourHand === CHOKI && pcHand === PA)||(yourHand === PA && pcHand===GU)){
+      // audio.currentTime = 0;
+      audio = winSound;
+      audio.load();
+      audio.play();
+      $judgment.html(winMsg);
+      startEnable();
+      btnHideControl(yourHand);
+      guchopaDisable();
+      winCount += 1;
+      multiDisplay();
+    }
+
+    //負けパターン
+    if((pcHand === GU && yourHand === CHOKI)||(pcHand === CHOKI && yourHand === PA)||(pcHand === PA && yourHand===GU)){
+      $judgment.html(loseMsg);
+      // audio.currentTime = 0;
+      audio = loseSound;
+      audio.load();
+      audio.play();
+      startEnable();
+      btnHideControl(yourHand);
+      guchopaDisable();
+      multiClear();
+      bgGifDisplay(9);
+    }
+    //あいこパターン イコール
+    if(yourHand === pcHand) {
+      $judgment.html(evenMsg);
+      // audio.currentTime = 0;
+      audio = evenSound;
+      audio.load();
+      audio.play();
+      // startDisable();
+      guchopaEnable();
+      setTimeout(guchopaRoundFunction, 600);
+    }
+
+  }
+
+  function guchopaRoundFunction() {
+      $pcHands.html(guchopaImg);
+    }
+
+  function displayHtml() {
+      //表示の処理
+      if(pcHand === GU) {
+        $pcHands.html(guImg_L);
+      }
+      if(pcHand === CHOKI) {
+        $pcHands.html(choImg_L);
+      }
+      if(pcHand === PA) {
+        $pcHands.html(paImg_L);
+      }
+  }
+
+  function guchopaDisable(){
+    $("#gu_btn, #cho_btn, #par_btn").prop("disabled", true);
+    isGuChokiPaAble = false;
+    console.log('guchopaDisable');
+  }
+  
+  function guchopaEnable(){
+    $("#gu_btn, #cho_btn, #par_btn").prop("disabled", false);
+    isGuChokiPaAble = true;
+    console.log('guchopaEnable');
+  }
+
+  function btnHideControl(yourHand=0) {
+    if(yourHand === GU){
+      $("#cho_btn, #par_btn").hide();
+    } else if(yourHand === CHOKI){
+      $("#gu_btn,#par_btn").hide();
+    } else if(yourHand === PA){
+      $("#gu_btn,#cho_btn").hide();
+    } else {
+      $("#gu_btn, #cho_btn, #par_btn").hide();
+    }
+  }
+  function btnShowControl(){
+    $("#gu_btn, #cho_btn, #par_btn").show();
+  }
+  
+  function startDisable(){
+    $("#start_btn").prop("disabled", true);
+    isStartAble = false;
+    console.log('startDisable');
+  }
+  
+  function startEnable(){
+    $("#start_btn").prop("disabled", false);
+    isStartAble = true;
+    bgGifDisplay();
+    console.log('startEnable');
+  }
+
+  function initStatus() {
+    pcHand = 0;
+    yourHand = 0;
+    $yourHands.html(clearMsg);
+    $judgment.html(clearMsg);
+    medalInfo();
+    bgGifDisplay();
+    // audio = junkenponSound;
+    console.log('initStatus');
+  }
+
+  function multiDisplay() {
+    if(winCount === 1) {
+      $multiAll.css("background-color","#ffcaca");
+      $multi02.css("background-color","#f98fab");
+      medalPayment(2);
+      bgGifDisplay(1);
+    }
+    if(winCount === 2) {
+      $multiAll.css("background-color","#ffcaca");
+      $multi04.css("background-color","#f98fab");
+      medalPayment(4);
+      bgGifDisplay(1);
+    }
+    if(winCount === 3) {
+      $multiAll.css("background-color","#ffcaca");
+      $multi08.css("background-color","#f98fab");
+      medalPayment(8);
+      bgGifDisplay(1);
+    }
+    if(winCount === 4) {
+      $multiAll.css("background-color","#ffcaca");
+      $multi16.css("background-color","#f98fab");
+      medalPayment(16);
+      bgGifDisplay(2);
+    }
+    if(winCount === 5) {
+      $multiAll.css("background-color","#ffcaca");
+      $multi32.css("background-color","#f98fab");
+      medalPayment(32);
+      bgGifDisplay(2);
+      ending();
+    }
+  }
+
+  function bgGifDisplay(num=0){
+    if(num === 0){
+      $("body").css('background-image','url(none)');
+    }
+    if(num === 1){
+      $("body").css('background-image','url(./img/raining-money-26.gif)');
+    }
+    if(num === 2){
+      $("body").css("background-image","url(./img/raining-money-12.gif)");
+    }
+    if(num === 9){
+      $("body").css("background-image","url(./img/lose.png)");
+    }
+    
+    
+
+  }
+
+  function multiClear() {
+    winCount = 0;
+    $multiAll.css("background-color","#ffcaca");
+  }
+
+  function ending() {
+    winCount = 0;
+    // なんかムービー
+  }
+
+  function medalPayment(num) {
+    medal += num;
+    medalInfo();
+  }
+
+  function medalConsumption() {
+    medal -= 1;
+    medalInfo();
+    console.log('medalConsumption()');
+  }
+
+  function medalInfo() {
+    $medalnum.html('<h4>' + medal + '</h4>');
+  }
+
+  function isPlayAble() {
+    if(medal > 0){
+      return true;
+    } else {
+      alert("メダルを購入してください");
+      return false;
+    }
+  }
+
+  function setCookie(){
+    $.cookie('01_guy_junken',medal);
+  }
+  function getCookie(){
+    return Number($.cookie('01_guy_junken'));
+  }
+  function deleteGookie(){
+    $.removeCookie('01_guy_junken');
+  }
+  function audioStop(){
+    if(!audiAble){
+      return;
+    }
+    $sound.hide();
+    audiAble = false;
+  }
+
+  function audioStart(){
+    if(audiAble){
+      return;
+    }
+    $sound.show();
+    audiAble = true;
+  }
+
+
+
+});
+
+
+
+
+</script>
+</body>
+</html>
