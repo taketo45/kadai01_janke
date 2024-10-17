@@ -115,7 +115,7 @@ const junkenponSound = $("#junkenponSound").get(0);
 const winSound = $("#winSound").get(0);
 const loseSound = $("#loseSound").get(0);
 const evenSound = $("#evenSound").get(0);
-let winCount = 0;
+let winCount = 3;
 const $multi02 = $("#multi02");
 const $multi04 = $("#multi04");
 const $multi08 = $("#multi08");
@@ -134,8 +134,27 @@ let audiAble = false;
 let $sound = $(".sound");
 let isGuChokiPaAble = false;
 let isStartAble = true;
-// const medalDelete = $("#medalDelete");
-
+const S_KEY = 83;
+const G_KEY = 71;
+const K_KEY = 75;
+const P_KEY = 80;
+const BG_NONE = 0;
+const BG_LITTLE = 1;
+const BG_MANY = 2;
+const BG_LOSE = 9;
+const $body = $("body");
+const BG_IMG = 'background-image';
+const urlNone = 'url(none)';
+const urlLittle = 'url(./img/raining-money-26.gif)';
+const urlMany = 'url(./img/raining-money-12.gif)';
+const urlLose = 'url(./img/lose.png)';
+const BG_COLOR = "background-color";
+const INIT_BTN_CLR = "#c3f2ff";
+const PUSH_BTN_CLR = "#0066CC";
+const INIT_MULTI_CLR = "#ffcaca";
+const APPLY_MULTI_CLR = "#f98fab";
+const BUY_MEDAL_MESSAGE = "メダルを購入してください";
+const COOKIE_NAME = '01_guy_janken';
 
 $document.ready(function() {
   // グー、チョキ、パーのボタンを最初に無効化
@@ -144,7 +163,7 @@ $document.ready(function() {
   audio = junkenponSound;
   // audioStop();
   medalInfo();
-  bgGifDisplay(1);
+  bgGifDisplay(BG_LITTLE);
 
   $tenYenInsert.on("click",function(){
     medalPayment(1);
@@ -185,24 +204,25 @@ $paBtn.on("click",function(){
   paFunction();
 });
 
+
 $document.keydown(function (e) {
   const key = e.keyCode;
-  if(key == 83){
+  if(key == S_KEY){
     startFunction();
   }
-  if(key === 71){
+  if(key === G_KEY){
     if(!isGuChokiPaAble){
       return;
     }
     guFunction();
   }
-  if(key === 75){
+  if(key === K_KEY){
     if(!isGuChokiPaAble){
       return;
     }
     chokiFunction();
   }
-  if(key === 80){
+  if(key === P_KEY){
     if(!isGuChokiPaAble){
       return;
     }
@@ -225,11 +245,11 @@ function startFunction(){
         $startBtn.animate({width: "105px"}, 100);
       }, 100);
     });
-    console.log('animate');
+    // console.log('animate');
     audio = junkenponSound;
     audio.load();
     audio.play();
-    console.log('sound');
+    // console.log('sound');
     guchopaRoundFunction();
     clearBtn();
     guchopaEnable();
@@ -239,7 +259,7 @@ function startFunction(){
 function guFunction(){
   yourHand = GU;
   clearBtn();
-  $guBtn.css("background","#0066CC");
+  $guBtn.css("background",PUSH_BTN_CLR);
   $yourHands.html(guImg);
   pcJunken();
   audio.pause();
@@ -250,7 +270,7 @@ function guFunction(){
 function chokiFunction(){
   yourHand = CHOKI;
   clearBtn();
-  $choBtn.css("background","#0066CC");
+  $choBtn.css("background",PUSH_BTN_CLR);
   $yourHands.html(choImg);
   pcJunken();
   audio.pause();
@@ -261,7 +281,7 @@ function chokiFunction(){
 function paFunction(){
   yourHand = PA;
   clearBtn();
-  $paBtn.css("background","#0066CC");
+  $paBtn.css("background",PUSH_BTN_CLR);
   $yourHands.html(paImg);
   pcJunken();
   audio.pause();
@@ -270,9 +290,9 @@ function paFunction(){
 }
 
 function clearBtn() {
-  $guBtn.css("background","#c3f2ff");
-  $choBtn.css("background","#c3f2ff");
-  $paBtn.css("background","#c3f2ff");
+  $guBtn.css("background",INIT_BTN_CLR);
+  $choBtn.css("background",INIT_BTN_CLR);
+  $paBtn.css("background",INIT_BTN_CLR);
 }
 
   function pcJunken() {
@@ -307,7 +327,7 @@ function clearBtn() {
       btnHideControl(yourHand);
       guchopaDisable();
       multiClear();
-      bgGifDisplay(9);
+      bgGifDisplay(BG_LOSE);
     }
     //あいこパターン イコール
     if(yourHand === pcHand) {
@@ -343,13 +363,13 @@ function clearBtn() {
   function guchopaDisable(){
     $("#gu_btn, #cho_btn, #par_btn").prop("disabled", true);
     isGuChokiPaAble = false;
-    console.log('guchopaDisable');
+    // console.log('guchopaDisable');
   }
   
   function guchopaEnable(){
     $("#gu_btn, #cho_btn, #par_btn").prop("disabled", false);
     isGuChokiPaAble = true;
-    console.log('guchopaEnable');
+    // console.log('guchopaEnable');
   }
 
   function btnHideControl(yourHand=0) {
@@ -370,14 +390,14 @@ function clearBtn() {
   function startDisable(){
     $("#start_btn").prop("disabled", true);
     isStartAble = false;
-    console.log('startDisable');
+    // console.log('startDisable');
   }
   
   function startEnable(){
     $("#start_btn").prop("disabled", false);
     isStartAble = true;
-    bgGifDisplay();
-    console.log('startEnable');
+    bgGifDisplay(BG_NONE);
+    // console.log('startEnable');
   }
 
   function initStatus() {
@@ -386,66 +406,63 @@ function clearBtn() {
     $yourHands.html(clearMsg);
     $judgment.html(clearMsg);
     medalInfo();
-    bgGifDisplay();
+    bgGifDisplay(BG_NONE);
     // audio = junkenponSound;
-    console.log('initStatus');
+    // console.log('initStatus');
   }
 
   function multiDisplay() {
     if(winCount === 1) {
-      $multiAll.css("background-color","#ffcaca");
-      $multi02.css("background-color","#f98fab");
+      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+      $multi02.css(BG_COLOR,APPLY_MULTI_CLR);
       medalPayment(2);
-      bgGifDisplay(1);
+      bgGifDisplay(BG_LITTLE);
     }
     if(winCount === 2) {
-      $multiAll.css("background-color","#ffcaca");
-      $multi04.css("background-color","#f98fab");
+      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+      $multi04.css(BG_COLOR,APPLY_MULTI_CLR);
       medalPayment(4);
-      bgGifDisplay(1);
+      bgGifDisplay(BG_LITTLE);
     }
     if(winCount === 3) {
-      $multiAll.css("background-color","#ffcaca");
-      $multi08.css("background-color","#f98fab");
+      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+      $multi08.css(BG_COLOR,APPLY_MULTI_CLR);
       medalPayment(8);
-      bgGifDisplay(1);
+      bgGifDisplay(BG_LITTLE);
     }
     if(winCount === 4) {
-      $multiAll.css("background-color","#ffcaca");
-      $multi16.css("background-color","#f98fab");
+      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+      $multi16.css(BG_COLOR,APPLY_MULTI_CLR);
       medalPayment(16);
-      bgGifDisplay(2);
+      bgGifDisplay(BG_MANY);
     }
     if(winCount === 5) {
-      $multiAll.css("background-color","#ffcaca");
-      $multi32.css("background-color","#f98fab");
+      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+      $multi32.css(BG_COLOR,APPLY_MULTI_CLR);
       medalPayment(32);
-      bgGifDisplay(2);
+      bgGifDisplay(BG_MANY);
       ending();
     }
   }
 
-  function bgGifDisplay(num=0){
-    if(num === 0){
-      $("body").css('background-image','url(none)');
+  function bgGifDisplay(bgtype=0){
+    if(bgtype === BG_NONE){ // 0
+      $body.css(BG_IMG,urlNone);
     }
-    if(num === 1){
-      $("body").css('background-image','url(./img/raining-money-26.gif)');
+    if(bgtype === BG_LITTLE){ // 1
+      $body.css(BG_IMG,urlLittle);
     }
-    if(num === 2){
-      $("body").css("background-image","url(./img/raining-money-12.gif)");
+    if(bgtype === BG_MANY){ // 2
+      $body.css(BG_IMG,urlMany);
     }
-    if(num === 9){
-      $("body").css("background-image","url(./img/lose.png)");
+    if(bgtype === BG_LOSE){ // 9
+      $body.css(BG_IMG,urlLose);
     }
-    
-    
-
   }
 
   function multiClear() {
     winCount = 0;
-    $multiAll.css("background-color","#ffcaca");
+    $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
   }
 
   function ending() {
@@ -461,7 +478,7 @@ function clearBtn() {
   function medalConsumption() {
     medal -= 1;
     medalInfo();
-    console.log('medalConsumption()');
+    // console.log('medalConsumption()');
   }
 
   function medalInfo() {
@@ -472,19 +489,19 @@ function clearBtn() {
     if(medal > 0){
       return true;
     } else {
-      alert("メダルを購入してください");
+      alert(BUY_MEDAL_MESSAGE);
       return false;
     }
   }
 
   function setCookie(){
-    $.cookie('01_guy_junken',medal);
+    $.cookie(COOKIE_NAME,medal);
   }
   function getCookie(){
-    return Number($.cookie('01_guy_junken'));
+    return Number($.cookie(COOKIE_NAME));
   }
   function deleteGookie(){
-    $.removeCookie('01_guy_junken');
+    $.removeCookie(COOKIE_NAME);
   }
   function audioStop(){
     if(!audiAble){
@@ -502,11 +519,7 @@ function clearBtn() {
     audiAble = true;
   }
 
-
-
 });
-
-
 
 
 </script>
