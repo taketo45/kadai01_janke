@@ -239,7 +239,8 @@ $document.keydown(function (e) {
 
 
 function startFunction(){
-  if(!isPlayAble()||isGaming) return;
+  if(isGaming) return;
+  if(!isPlayAble()) return;
   startDisable();
   medalConsumption();
   initStatus();
