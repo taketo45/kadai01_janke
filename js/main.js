@@ -1,8 +1,6 @@
 'use strict';
 //じゃんけん用のSCRIPTを書いてください
 
-let pcHand = 0;
-let yourHand = 0;
 const GU = 1;
 const CHOKI = 2;
 const PA = 3;
@@ -100,113 +98,114 @@ $document.ready(function() {
 
 
 
-$startBtn.on("click",function(){
-  if(isGaming) return;
-  startFunction();
-});
-
-$guBtn.on("click",function(){
-  jankenGame(GU);
-});
-
-
-
-$choBtn.on("click",function(){
-  jankenGame(CHOKI);
-});
-
-
-$paBtn.on("click",function(){
-  jankenGame(PA);
-});
-
-
-$document.keydown(function (e) {
-  const key = e.keyCode;
-  if(key == S_KEY){
+  $startBtn.on("click",function(){
+    if(isGaming) return;
     startFunction();
-  }
-  if(key === G_KEY){
-    if(!isGuChokiPaAble) return;
+  });
+
+  $guBtn.on("click",function(){
     jankenGame(GU);
-  }
-  if(key === K_KEY){
-    if(!isGuChokiPaAble) return;
+  });
+
+
+
+  $choBtn.on("click",function(){
     jankenGame(CHOKI);
-  }
-  if(key === P_KEY){
-    if(!isGuChokiPaAble) return;
+  });
+
+
+  $paBtn.on("click",function(){
     jankenGame(PA);
+  });
+
+
+  $document.keydown(function (e) {
+    const key = e.keyCode;
+    if(key == S_KEY){
+      startFunction();
+    }
+    if(key === G_KEY){
+      if(!isGuChokiPaAble) return;
+      jankenGame(GU);
+    }
+    if(key === K_KEY){
+      if(!isGuChokiPaAble) return;
+      jankenGame(CHOKI);
+    }
+    if(key === P_KEY){
+      if(!isGuChokiPaAble) return;
+      jankenGame(PA);
+    }
+  });
+
+
+  function startFunction(){
+    if(isGaming) return;
+    if(!isPlayAble()) return;
+    startDisable();
+    medalConsumption();
+    initStatus();
+    animateBtn($startBtn);
+    audio = junkenponSound;
+    audio.load();
+    audio.play();
+    // console.log('sound');
+    guchopaRoundFunction();
+    clearBtn();
+    guchopaEnable();
+    btnShowControl();
+    bgGifDisplay();
+    isGaming = true;
   }
-});
 
-
-function startFunction(){
-  if(isGaming) return;
-  if(!isPlayAble()) return;
-  startDisable();
-  medalConsumption();
-  initStatus();
-  animateBtn($startBtn);
-  audio = junkenponSound;
-  audio.load();
-  audio.play();
-  // console.log('sound');
-  guchopaRoundFunction();
-  clearBtn();
-  guchopaEnable();
-  btnShowControl();
-  bgGifDisplay();
-  isGaming = true;
-}
-
-function animateBtn($btn) {
-  $btn.animate({width: "90px"}, 100)
-    .promise().done(function() {
-      setTimeout(() => {
-        $btn.animate({width: "105px"}, 100);
-      }, 100);
-    });
-}
+  function animateBtn($btn) {
+    $btn.animate({width: "90px"}, 100)
+      .promise().done(function() {
+        setTimeout(() => {
+          $btn.animate({width: "105px"}, 100);
+        }, 100);
+      });
+  }
 
 
 
-function jankenGame(dashite) {
-  guchopaDisable();
-  yourHand = dashite;
-  const handMap = {
-    [GU]: { img: guImg, $btn: $guBtn },
-    [CHOKI]: { img: choImg, $btn: $choBtn },
-    [PA]: { img: paImg, $btn: $paBtn },
-  }; 
-  const { img, $btn } = handMap[dashite];
+  function jankenGame(yourHand) {
+    guchopaDisable();
+    // yourHand = dashite;
+    const handMap = {
+      [GU]: { img: guImg, $btn: $guBtn },
+      [CHOKI]: { img: choImg, $btn: $choBtn },
+      [PA]: { img: paImg, $btn: $paBtn },
+    }; 
+    const { img, $btn } = handMap[yourHand];
 
-  clearBtn();
-  $btn.css("background", PUSH_BTN_CLR);
-  $yourHands.html(img);
-  pcJunken();
-  audio.pause();
-  judgement();
-  medalInfo();
-}
+    clearBtn();
+    $btn.css("background", PUSH_BTN_CLR);
+    $yourHands.html(img);
+    pcJunken();
+    audio.pause();
+    judgement(yourHand,pcJunken());
+    medalInfo();
+  }
 
 
-function clearBtn() {
-  $guBtn.css("background",INIT_BTN_CLR);
-  $choBtn.css("background",INIT_BTN_CLR);
-  $paBtn.css("background",INIT_BTN_CLR);
-}
+  function clearBtn() {
+    $guBtn.css("background",INIT_BTN_CLR);
+    $choBtn.css("background",INIT_BTN_CLR);
+    $paBtn.css("background",INIT_BTN_CLR);
+  }
 
   function pcJunken() {
     //PCのじゃんけん
-    pcHand = Math.ceil(Math.random() * 3);
+    let pchand = Math.ceil(Math.random() * 3);
 
-    if(pcHand === GU) $pcHands.html(guImg_L); 
-    if(pcHand === CHOKI) $pcHands.html(choImg_L);
-    if(pcHand === PA) $pcHands.html(paImg_L);
+    if(pchand === GU) $pcHands.html(guImg_L); 
+    if(pchand === CHOKI) $pcHands.html(choImg_L);
+    if(pchand === PA) $pcHands.html(paImg_L);
+    return pchand;
   }
 
-  function judgement() {
+  function judgement(yourHand, pcHand) {
     //勝ちパターン
     if((yourHand === GU && pcHand === CHOKI)||(yourHand === CHOKI && pcHand === PA)||(yourHand === PA && pcHand === GU)){
       audio = winSound;
@@ -306,8 +305,8 @@ function clearBtn() {
   }
 
   function initStatus() {
-    pcHand = 0;
-    yourHand = 0;
+    // pcHand = 0;
+    // yourHand = 0;
     $yourHands.html(clearMsg);
     $judgment.html(clearMsg);
     medalInfo();
