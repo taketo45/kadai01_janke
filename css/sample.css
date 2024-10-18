@@ -114,7 +114,7 @@ li{
     /* background-color: #f98fab; */
     background-color: #ffcaca;
     display: flex;  
-    cursor: pointer;
+    cursor: default;
     width: 70px;
     height: 70px;
     border-radius: 50%;

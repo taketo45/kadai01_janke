@@ -144,17 +144,19 @@ const BG_MANY = 2;
 const BG_LOSE = 9;
 const $body = $("body");
 const BG_IMG = 'background-image';
-const urlNone = 'url(none)';
+const urlNone = 'none';
 const urlLittle = 'url(./img/raining-money-26.gif)';
 const urlMany = 'url(./img/raining-money-12.gif)';
 const urlLose = 'url(./img/lose.png)';
 const BG_COLOR = "background-color";
+const DEFALT_BG_CLR = "#f0e68c"; 
 const INIT_BTN_CLR = "#c3f2ff";
 const PUSH_BTN_CLR = "#0066CC";
 const INIT_MULTI_CLR = "#ffcaca";
 const APPLY_MULTI_CLR = "#f98fab";
 const BUY_MEDAL_MESSAGE = "メダルを購入してください";
 const COOKIE_NAME = '01_guy_janken';
+let isGaming = false;
 
 $document.ready(function() {
   // グー、チョキ、パーのボタンを最初に無効化
@@ -166,18 +168,22 @@ $document.ready(function() {
   bgGifDisplay(BG_LITTLE);
 
   $tenYenInsert.on("click",function(){
+    if(isGaming) return;
     medalPayment(1);
   });
   $hundredYenInsert.on("click",function(){
+    if(isGaming) return;
     medalPayment(10);
   });
 
   $medalSet.on("click",function(){
+    if(isGaming) return;
     setCookie();
     medal = 0;
     medalInfo();
   });
   $medalGet.on("click",function(){
+    if(isGaming) return;
     medal += getCookie()||0;
     deleteGookie();
     medalInfo();
@@ -186,22 +192,23 @@ $document.ready(function() {
 
 
 $startBtn.on("click",function(){
-    startFunction();
+  if(isGaming) return;
+  startFunction();
 });
 
 $guBtn.on("click",function(){
-  guFunction();
+  jankenGame(GU);
 });
 
 
 
 $choBtn.on("click",function(){
-  chokiFunction();
+  jankenGame(CHOKI);
 });
 
 
 $paBtn.on("click",function(){
-  paFunction();
+  jankenGame(PA);
 });
 
 
@@ -214,48 +221,40 @@ $document.keydown(function (e) {
     if(!isGuChokiPaAble){
       return;
     }
-    guFunction();
+    jankenGame(GU);
   }
   if(key === K_KEY){
     if(!isGuChokiPaAble){
       return;
     }
-    chokiFunction();
+    jankenGame(CHOKI);
   }
   if(key === P_KEY){
     if(!isGuChokiPaAble){
       return;
     }
-    paFunction();
+    jankenGame(PA);
   }
 });
 
 
 function startFunction(){
-  if(!isPlayAble()){
-    return;
-  }
+  if(!isPlayAble()||isGaming) return;
   startDisable();
   medalConsumption();
   initStatus();
   animateBtn($startBtn);
-  // $(this).animate({width: '90px'}, 1000,).delay(500).animate({width: '105px'}, 500);
-  // $startBtn.animate({width: "90px"}, 100)
-  //   .promise().done(function() {
-  //     setTimeout(() => {
-  //       $startBtn.animate({width: "105px"}, 100);
-  //     }, 100);
-  //   });
-    // console.log('animate');
-    audio = junkenponSound;
-    audio.load();
-    audio.play();
-    // console.log('sound');
-    guchopaRoundFunction();
-    clearBtn();
-    guchopaEnable();
-    btnShowControl();
-  }
+  audio = junkenponSound;
+  audio.load();
+  audio.play();
+  // console.log('sound');
+  guchopaRoundFunction();
+  clearBtn();
+  guchopaEnable();
+  btnShowControl();
+  bgGifDisplay(BG_NONE);
+  isGaming = true;
+}
 
 function animateBtn($btn) {
   $btn.animate({width: "90px"}, 100)
@@ -266,38 +265,27 @@ function animateBtn($btn) {
     });
 }
 
-function guFunction(){
-  yourHand = GU;
+
+
+function jankenGame(dashite) {
+  guchopaDisable();
+  yourHand = dashite;
+  const handMap = {
+    [GU]: { img: guImg, btn: $guBtn },
+    [CHOKI]: { img: choImg, btn: $choBtn },
+    [PA]: { img: paImg, btn: $paBtn },
+  }; 
+  const { img, btn } = handMap[dashite];
+
   clearBtn();
-  $guBtn.css("background",PUSH_BTN_CLR);
-  $yourHands.html(guImg);
+  btn.css("background", PUSH_BTN_CLR);
+  $yourHands.html(img);
   pcJunken();
   audio.pause();
   judgement();
-  displayHtml();
+  medalInfo();
 }
 
-function chokiFunction(){
-  yourHand = CHOKI;
-  clearBtn();
-  $choBtn.css("background",PUSH_BTN_CLR);
-  $yourHands.html(choImg);
-  pcJunken();
-  audio.pause();
-  judgement();
-  displayHtml();
-}
-
-function paFunction(){
-  yourHand = PA;
-  clearBtn();
-  $paBtn.css("background",PUSH_BTN_CLR);
-  $yourHands.html(paImg);
-  pcJunken();
-  audio.pause();
-  judgement();
-  displayHtml();
-}
 
 function clearBtn() {
   $guBtn.css("background",INIT_BTN_CLR);
@@ -308,6 +296,17 @@ function clearBtn() {
   function pcJunken() {
     //PCのじゃんけん
     pcHand = Math.ceil(Math.random() * 3);
+
+    if(pcHand === GU) {
+        $pcHands.html(guImg_L); //width="250"
+
+    }
+    if(pcHand === CHOKI) {
+      $pcHands.html(choImg_L);
+    }
+    if(pcHand === PA) {
+      $pcHands.html(paImg_L);
+    }
   }
 
   function judgement() {
@@ -319,11 +318,14 @@ function clearBtn() {
       audio.load();
       audio.play();
       $judgment.html(winMsg);
-      startEnable();
       btnHideControl(yourHand);
-      guchopaDisable();
+      // guchopaDisable();
       winCount += 1;
       multiDisplay();
+      setTimeout(() =>{
+        isGaming = false;
+        startEnable();
+      } ,1000);
     }
 
     //負けパターン
@@ -333,11 +335,14 @@ function clearBtn() {
       audio = loseSound;
       audio.load();
       audio.play();
-      startEnable();
       btnHideControl(yourHand);
-      guchopaDisable();
+      // guchopaDisable();
       multiClear();
       bgGifDisplay(BG_LOSE);
+      setTimeout(() =>{
+        isGaming = false;
+        startEnable();
+      } ,1000);
     }
     //あいこパターン イコール
     if(yourHand === pcHand) {
@@ -347,8 +352,10 @@ function clearBtn() {
       audio.load();
       audio.play();
       // startDisable();
-      guchopaEnable();
-      setTimeout(guchopaRoundFunction, 600);
+      setTimeout(()=>{
+        guchopaRoundFunction();
+        guchopaEnable();
+      }, 600);
     }
 
   }
@@ -356,19 +363,6 @@ function clearBtn() {
   function guchopaRoundFunction() {
       $pcHands.html(guchopaImg);
     }
-
-  function displayHtml() {
-      //表示の処理
-      if(pcHand === GU) {
-        $pcHands.html(guImg_L);
-      }
-      if(pcHand === CHOKI) {
-        $pcHands.html(choImg_L);
-      }
-      if(pcHand === PA) {
-        $pcHands.html(paImg_L);
-      }
-  }
 
   function guchopaDisable(){
     $("#gu_btn, #cho_btn, #par_btn").prop("disabled", true);
@@ -382,17 +376,23 @@ function clearBtn() {
     // console.log('guchopaEnable');
   }
 
+
+
   function btnHideControl(yourHand=0) {
     if(yourHand === GU){
       $("#cho_btn, #par_btn").hide();
-    } else if(yourHand === CHOKI){
+    } 
+    if(yourHand === CHOKI){
       $("#gu_btn,#par_btn").hide();
-    } else if(yourHand === PA){
+    } 
+    if(yourHand === PA){
       $("#gu_btn,#cho_btn").hide();
-    } else {
+    } 
+    if(yourHand === 0) {
       $("#gu_btn, #cho_btn, #par_btn").hide();
     }
   }
+
   function btnShowControl(){
     $("#gu_btn, #cho_btn, #par_btn").show();
   }
@@ -406,7 +406,7 @@ function clearBtn() {
   function startEnable(){
     $("#start_btn").prop("disabled", false);
     isStartAble = true;
-    bgGifDisplay(BG_NONE);
+    // bgGifDisplay(BG_NONE);
     // console.log('startEnable');
   }
 
@@ -417,42 +417,51 @@ function clearBtn() {
     $judgment.html(clearMsg);
     medalInfo();
     bgGifDisplay(BG_NONE);
-    // audio = junkenponSound;
-    // console.log('initStatus');
   }
 
+
+  
   function multiDisplay() {
-    if(winCount === 1) {
-      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
-      $multi02.css(BG_COLOR,APPLY_MULTI_CLR);
-      medalPayment(2);
-      bgGifDisplay(BG_LITTLE);
-    }
-    if(winCount === 2) {
-      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
-      $multi04.css(BG_COLOR,APPLY_MULTI_CLR);
-      medalPayment(4);
-      bgGifDisplay(BG_LITTLE);
-    }
-    if(winCount === 3) {
-      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
-      $multi08.css(BG_COLOR,APPLY_MULTI_CLR);
-      medalPayment(8);
-      bgGifDisplay(BG_LITTLE);
-    }
-    if(winCount === 4) {
-      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
-      $multi16.css(BG_COLOR,APPLY_MULTI_CLR);
-      medalPayment(16);
-      bgGifDisplay(BG_MANY);
-    }
-    if(winCount === 5) {
-      $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
-      $multi32.css(BG_COLOR,APPLY_MULTI_CLR);
-      medalPayment(32);
-      bgGifDisplay(BG_MANY);
-      ending();
-    }
+    const multiMap = {
+    [1]: { $disp: $multi02, medal: 2, img: BG_LITTLE },
+    [2]: { $disp: $multi04, medal: 4, img: BG_LITTLE },
+    [3]: { $disp: $multi08, medal: 8, img: BG_LITTLE },
+    [4]: { $disp: $multi16, medal: 16, img: BG_MANY },
+    [5]: { $disp: $multi32, medal: 32, img: BG_MANY },
+    };
+
+    const { $disp, medal, img } = multiMap[winCount];
+    $multiAll.css(BG_COLOR,INIT_MULTI_CLR);
+    $disp.css(BG_COLOR,APPLY_MULTI_CLR);
+    medalPayment(medal);
+    bgGifDisplay(img);
+
+    // if(winCount === 1) {
+    //   $multi02.css(BG_COLOR,APPLY_MULTI_CLR);
+    //   medalPayment(2);
+    //   bgGifDisplay(BG_LITTLE);
+    // }
+    // if(winCount === 2) {
+    //   $multi04.css(BG_COLOR,APPLY_MULTI_CLR);
+    //   medalPayment(4);
+    //   bgGifDisplay(BG_LITTLE);
+    // }
+    // if(winCount === 3) {
+    //   $multi08.css(BG_COLOR,APPLY_MULTI_CLR);
+    //   medalPayment(8);
+    //   bgGifDisplay(BG_LITTLE);
+    // }
+    // if(winCount === 4) {
+    //   $multi16.css(BG_COLOR,APPLY_MULTI_CLR);
+    //   medalPayment(16);
+    //   bgGifDisplay(BG_MANY);
+    // }
+    // if(winCount === 5) {
+    //   $multi32.css(BG_COLOR,APPLY_MULTI_CLR);
+    //   medalPayment(32);
+    //   bgGifDisplay(BG_MANY);
+    //   ending();
+    // }
   }
 
   function bgGifDisplay(bgtype=0){
