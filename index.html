@@ -115,7 +115,7 @@ const junkenponSound = $("#junkenponSound").get(0);
 const winSound = $("#winSound").get(0);
 const loseSound = $("#loseSound").get(0);
 const evenSound = $("#evenSound").get(0);
-let winCount = 1;
+let winCount = 0;
 const $multi02 = $("#multi02");
 const $multi04 = $("#multi04");
 const $multi08 = $("#multi08");
@@ -238,13 +238,14 @@ function startFunction(){
   startDisable();
   medalConsumption();
   initStatus();
+  animateBtn($startBtn);
   // $(this).animate({width: '90px'}, 1000,).delay(500).animate({width: '105px'}, 500);
-  $startBtn.animate({width: "90px"}, 100)
-    .promise().done(function() {
-      setTimeout(() => {
-        $startBtn.animate({width: "105px"}, 100);
-      }, 100);
-    });
+  // $startBtn.animate({width: "90px"}, 100)
+  //   .promise().done(function() {
+  //     setTimeout(() => {
+  //       $startBtn.animate({width: "105px"}, 100);
+  //     }, 100);
+  //   });
     // console.log('animate');
     audio = junkenponSound;
     audio.load();
@@ -255,6 +256,15 @@ function startFunction(){
     guchopaEnable();
     btnShowControl();
   }
+
+function animateBtn($btn) {
+  $btn.animate({width: "90px"}, 100)
+    .promise().done(function() {
+      setTimeout(() => {
+        $btn.animate({width: "105px"}, 100);
+      }, 100);
+    });
+}
 
 function guFunction(){
   yourHand = GU;
