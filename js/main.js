@@ -144,7 +144,7 @@ function handleKeyPress(e){
   }
 
   const hadler = keyHandlers[e.keyCode];
-  if(hadler) hadler();
+  if(hadler) hadler(); //S,G,K,P以外のキーが入力されると,keyHandlersの中に定義がないため、結果がundifinedになる。これをif(hadler)で判定するとfalseとなり処理が停止する
 }
 
 function startGame(){
@@ -323,7 +323,7 @@ function initStatus() {
 
 
 function multiDisplay() {
-  const multiMap = {
+  const multiHandle = {
   [1]: { $disp: $multi02, medal: 2, img: BACKGROUNDS.LITTLE },
   [2]: { $disp: $multi04, medal: 4, img: BACKGROUNDS.LITTLE },
   [3]: { $disp: $multi08, medal: 8, img: BACKGROUNDS.LITTLE },
@@ -331,7 +331,7 @@ function multiDisplay() {
   [5]: { $disp: $multi32, medal: 32, img: BACKGROUNDS.MANY },
   };
 
-  const { $disp, medal, img } = multiMap[gameStatus.winCount];
+  const { $disp, medal, img } = multiHandle[gameStatus.winCount];
   $multiAll.css(BG_COLOR,COLORS.INIT_MULTI);
   $disp.css(BG_COLOR,COLORS.APPLY_MULTI);
   medalPayment(medal);
