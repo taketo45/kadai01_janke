@@ -259,7 +259,6 @@ function loseHandle(yourHand){
 function evenHandle(){
   $judgment.html(MESSAGES.EVEN);
   playSound(SOUNDS.EVEN);
-  // startDisable();
   setTimeout(()=>{
     guchopaRoundFunction();
     guchopaEnable();
@@ -268,18 +267,16 @@ function evenHandle(){
 
 function guchopaRoundFunction() {
   $pcHands.html(IMAGES.GUCHOPA);
-  }
+}
 
 function guchopaDisable(){
   $("#gu_btn, #cho_btn, #par_btn").prop("disabled", true);
   gameStatus.isGuChokiPaAble = false;
-  // console.log('guchopaDisable');
 }
 
 function guchopaEnable(){
   $("#gu_btn, #cho_btn, #par_btn").prop("disabled", false);
   gameStatus.isGuChokiPaAble = true;
-  // console.log('guchopaEnable');
 }
 
 function btnHideControl(yourHand=0) {
@@ -305,7 +302,6 @@ function btnShowControl(){
 function startDisable(){
   $("#start_btn").prop("disabled", true);
   gameStatus.isStartAble = false;
-  // console.log('startDisable');
 }
 
 function startEnable(){
@@ -361,7 +357,6 @@ function medalPayment(num) {
 function medalConsumption() {
   gameStatus.medal -= 1;
   updateMedalInfo();
-  // console.log('medalConsumption()');
 }
 
 function updateMedalInfo() {
